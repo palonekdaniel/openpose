@@ -1,6 +1,6 @@
 # ------------------------- BODY, FOOT, FACE, AND HAND MODELS -------------------------
 # Downloading body pose (COCO and MPI), face and hand models
-OPENPOSE_URL="http://vcl.snu.ac.kr/OpenPose/models/"
+OPENPOSE_URL="https://www.dropbox.com/scl/fo/axfpgbpe1o9ivk3qtf11m/AGY9Ot1lEZ0uMOkFEXfDHM0?rlkey=1rretqg41r3lji0pwpy1oeeu7&st=yzbw5gqy&dl=0"
 POSE_FOLDER="pose/"
 FACE_FOLDER="face/"
 HAND_FOLDER="hand/"
