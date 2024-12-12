@@ -23,6 +23,7 @@ def printKeypoints(datums):
 
 
 try:
+    """
     # Import Openpose (Windows/Ubuntu/OSX)
     dir_path = os.path.dirname(os.path.realpath(__file__))
     try:
@@ -41,6 +42,7 @@ try:
     except ImportError as e:
         print('Error: OpenPose library could not be found. Did you enable `BUILD_PYTHON` in CMake and have this Python script in the right folder?')
         raise e
+    """
 
     # Flags
     parser = argparse.ArgumentParser()
@@ -49,7 +51,7 @@ try:
 
     # Custom Params (refer to include/openpose/flags.hpp for more parameters)
     params = dict()
-    params["model_folder"] = "../../../models/"
+    params["model_folder"] = "../../models/"
 
     # Add others in path?
     for i in range(0, len(args[1])):

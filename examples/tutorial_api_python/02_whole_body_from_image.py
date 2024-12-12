@@ -5,8 +5,10 @@ import cv2
 import os
 from sys import platform
 import argparse
+import pyopenpose as op
 
 try:
+    """
     # Import Openpose (Windows/Ubuntu/OSX)
     dir_path = os.path.dirname(os.path.realpath(__file__))
     try:
@@ -25,15 +27,17 @@ try:
     except ImportError as e:
         print('Error: OpenPose library could not be found. Did you enable `BUILD_PYTHON` in CMake and have this Python script in the right folder?')
         raise e
+    """
 
     # Flags
     parser = argparse.ArgumentParser()
-    parser.add_argument("--image_path", default="../../../examples/media/COCO_val2014_000000000241.jpg", help="Process an image. Read all standard formats (jpg, png, bmp, etc.).")
+    parser.add_argument("--image_path", default="../../examples/tutorial_api_python/input-front.jpg", help="Process an image. Read all standard formats (jpg, png, bmp, etc.).")
     args = parser.parse_known_args()
 
     # Custom Params (refer to include/openpose/flags.hpp for more parameters)
     params = dict()
-    params["model_folder"] = "../../../models/"
+    params["model_folder"] = "../../models/"
+    params["net_resolution"] = "320x176"
     params["face"] = True
     params["hand"] = True
 
@@ -69,8 +73,9 @@ try:
     print("Face keypoints: \n" + str(datum.faceKeypoints))
     print("Left hand keypoints: \n" + str(datum.handKeypoints[0]))
     print("Right hand keypoints: \n" + str(datum.handKeypoints[1]))
-    cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", datum.cvOutputData)
-    cv2.waitKey(0)
+    cv2.imwrite("result_body.jpg", datum.cvOutputData)
+    #cv2.imshow("OpenPose 1.6.0 - Tutorial Python API", datum.cvOutputData)
+    #cv2.waitKey(0)
 except Exception as e:
     print(e)
     sys.exit(-1)
