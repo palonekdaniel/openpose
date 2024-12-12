@@ -4,7 +4,7 @@
 echo ------------------------- BODY, FOOT, FACE, AND HAND MODELS -------------------------
 echo ----- Downloading body pose (COCO and MPI), face and hand models -----
 SET WGET_EXE=..\3rdparty\windows\wget\wget.exe
-SET OPENPOSE_URL=http://vcl.snu.ac.kr/OpenPose/models/
+SET OPENPOSE_URL=https://www.dropbox.com/scl/fo/axfpgbpe1o9ivk3qtf11m/AGY9Ot1lEZ0uMOkFEXfDHM0?rlkey=1rretqg41r3lji0pwpy1oeeu7&st=yzbw5gqy&dl=0
 SET POSE_FOLDER=pose/
 SET FACE_FOLDER=face/
 SET HAND_FOLDER=hand/
