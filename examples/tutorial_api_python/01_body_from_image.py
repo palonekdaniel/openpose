@@ -32,7 +32,7 @@ try:
 
     # Flags
     parser = argparse.ArgumentParser()
-    parser.add_argument("--image_path", default="../../examples/tutorial_api_python/body_mesh_with_parts_front.jpg", help="Process an image. Read all standard formats (jpg, png, bmp>")
+    parser.add_argument("--image_path", default="../../examples/tutorial_api_python/input_front_correct.jpg", help="Process an image. Read all standard formats (jpg, png, bmp>")
     parser.add_argument("--output-json", default="keypoints.json", help="Output json file")
     args = parser.parse_known_args()
 
