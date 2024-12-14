@@ -1,51 +1,56 @@
-# From Python
-# It requires OpenCV installed for Python
-import sys
+import base64
+import json
 
 import cv2
-import os
-import json
-from sys import platform
-import argparse
+import numpy as np
 import pyopenpose as op
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from pydantic.v1 import validator
 
 app = FastAPI()
 
-@app.post("/process-keypoints")
-def process_body_keypoints():
-    # Flags
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--image_path", default="../../examples/tutorial_api_python/body_mesh_with_parts_front.jpg", help="Process an image. Read all standard formats (jpg, png, bmp>")
-    parser.add_argument("--output-json", default="keypoints.json", help="Output json file")
-    args = parser.parse_known_args()
+class ImageProcessingRequest(BaseModel):
+    front_img: str
+    profile_img: str
 
-    # Custom Params (refer to include/openpose/flags.hpp for more parameters)
+    @validator('front_img')
+    def validate_person_height(cls, value):
+        if not value.strip():
+            raise ValueError('front_img cannot be empty string')
+        return value
+
+    @validator('profile_img')
+    def validate_person_weight(cls, value):
+        if not value.strip():
+            raise ValueError('person_weight cannot be empty string')
+        return value
+
+def decode_base64_image(base64_string: str) -> np.ndarray:
+    image_data = base64.b64decode(base64_string)
+    image_array = np.frombuffer(image_data, dtype=np.uint8)
+    image = (
+        cv2.imdecode(image_array, cv2.IMREAD_COLOR))
+    return image
+
+@app.post("/process-keypoints")
+async def process_image_endpoint(request_data: ImageProcessingRequest):
+    try:
+        result = process_body_keypoints(request_data)
+        if "error" in result:
+            raise HTTPException(status_code=400, detail=result["error"])
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+def process_body_keypoints(request_data: ImageProcessingRequest):
+    front_image = decode_base64_image(request_data.front_img)
+    profile_image = decode_base64_image(request_data.profile_img)
+
     params = dict()
     params["model_folder"] = "/openpose/models/"
     params["net_resolution"] = "320x176"
     params["model_pose"] = "BODY_25"
-
-    #params["num_gpu"] = 0                # Disable GPU usage
-    #params["num_gpu_start"] = 0
-    #params["disable_multi_thread"] = True  # Ensure only one thread is usedwq
-
-
-    # Add others in path?
-    for i in range(0, len(args[1])):
-        curr_item = args[1][i]
-        if i != len(args[1])-1: next_item = args[1][i+1]
-        else: next_item = "1"
-        if "--" in curr_item and "--" in next_item:
-            key = curr_item.replace('-','')
-            if key not in params:  params[key] = "1"
-        elif "--" in curr_item and "--" not in next_item:
-            key = curr_item.replace('-','')
-            if key not in params: params[key] = next_item
-
-    # Construct it from system arguments
-    # op.init_argv(args[1])
-    # oppython = op.OpenposePython()
 
     # Starting OpenPose
     opWrapper = op.WrapperPython()
@@ -54,19 +59,22 @@ def process_body_keypoints():
 
     # Process Image
     datum = op.Datum()
-    imageToProcess = cv2.imread(args[0].image_path)
-    datum.cvInputData = imageToProcess
+    datum.cvInputData = front_image
     opWrapper.emplaceAndPop(op.VectorDatum([datum]))
 
-    keypoints = datum.poseKeypoints.tolist() if datum.poseKeypoints is not None else None
-    output_json_path = args[0].output_json
-    with open(output_json_path, 'w') as f:
-        json.dump({"keypoints": keypoints}, f, indent=4)
-    # Display Image
-    print("Body keypoints: \n" + str(datum.poseKeypoints))
-    cv2.imwrite("result_body.jpg", datum.cvOutputData)
-    #cv2.imshow("OpenPose 1.6.0 - Tutorial Python API", datum.cvOutputData)
-    #cv2.waitKey(0)
-except Exception as e:
-    print(e)
-    sys.exit(-1)
+    keypoints_front = datum.poseKeypoints.tolist() if datum.poseKeypoints is not None else None
+    json.dump({"keypoints": keypoints_front}, indent=4)
+    print("Body keypoints front: \n" + str(datum.poseKeypoints))
+    skeleton_front = datum.cvOutputData
+
+    datum.cvInputData = profile_image
+    opWrapper.emplaceAndPop(op.VectorDatum([datum]))
+
+    keypoints_profile = datum.poseKeypoints.tolist() if datum.poseKeypoints is not None else None
+    json.dump({"keypoints": keypoints_profile}, indent=4)
+    print("Body keypoints profile: \n" + str(datum.poseKeypoints))
+    skeleton_profile = datum.cvOutputData
+    return {"skeleton_front": skeleton_front,
+            "keypoints_front": keypoints_front,
+            "skeleton_profile": skeleton_profile,
+            "keypoints_profile": keypoints_profile}
