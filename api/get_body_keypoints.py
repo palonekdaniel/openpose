@@ -33,6 +33,11 @@ def decode_base64_image(base64_string: str) -> np.ndarray:
         cv2.imdecode(image_array, cv2.IMREAD_COLOR))
     return image
 
+def encode_image_to_base64(image: np.ndarray) -> str:
+    _, buffer = cv2.imencode('.jpg', image)  # Encoding to JPEG
+    image_bytes = buffer.tobytes()
+    return base64.b64encode(image_bytes).decode('utf-8')
+
 @app.post("/process-keypoints")
 async def process_image_endpoint(request_data: ImageProcessingRequest):
     try:
@@ -74,7 +79,11 @@ def process_body_keypoints(request_data: ImageProcessingRequest):
     json.dump({"keypoints": keypoints_profile}, indent=4)
     print("Body keypoints profile: \n" + str(datum.poseKeypoints))
     skeleton_profile = datum.cvOutputData
-    return {"skeleton_front": skeleton_front,
+
+    skeleton_front_base64 = encode_image_to_base64(skeleton_front)
+    skeleton_profile_base64 = encode_image_to_base64(skeleton_profile)
+
+    return {"skeleton_front": skeleton_front_base64,
             "keypoints_front": keypoints_front,
-            "skeleton_profile": skeleton_profile,
+            "skeleton_profile": skeleton_profile_base64,
             "keypoints_profile": keypoints_profile}
