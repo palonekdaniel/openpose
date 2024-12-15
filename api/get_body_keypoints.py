@@ -78,7 +78,7 @@ def process_body_keypoints(request_data: ImageProcessingRequest):
     opWrapper.emplaceAndPop(op.VectorDatum([datum]))
 
     keypoints_front = datum.poseKeypoints.tolist() if datum.poseKeypoints is not None else None
-    json.dump({"keypoints": keypoints_front}, indent=4)
+    json.dumps({"keypoints": keypoints_front}, indent=4)
     print("Body keypoints front: \n" + str(datum.poseKeypoints))
     skeleton_front = datum.cvOutputData
 
@@ -86,7 +86,7 @@ def process_body_keypoints(request_data: ImageProcessingRequest):
     opWrapper.emplaceAndPop(op.VectorDatum([datum]))
 
     keypoints_profile = datum.poseKeypoints.tolist() if datum.poseKeypoints is not None else None
-    json.dump({"keypoints": keypoints_profile}, indent=4)
+    json.dumps({"keypoints": keypoints_profile}, indent=4)
     print("Body keypoints profile: \n" + str(datum.poseKeypoints))
     skeleton_profile = datum.cvOutputData
 
