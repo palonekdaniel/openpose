@@ -52,6 +52,9 @@ def process_body_keypoints(request_data: ImageProcessingRequest):
     front_image = decode_base64_image(request_data.front_img)
     profile_image = decode_base64_image(request_data.profile_img)
 
+    print("Front image: " + front_image[:100])
+    print("Profile image: " + profile_image[:100])
+
     params = dict()
     params["model_folder"] = "/openpose/models/"
     params["net_resolution"] = "320x176"
