@@ -26,11 +26,19 @@ class ImageProcessingRequest(BaseModel):
             raise ValueError('person_weight cannot be empty string')
         return value
 
+
 def decode_base64_image(base64_string: str) -> np.ndarray:
+    # Remove the data URL prefix if present
+    if base64_string.startswith("data:image"):
+        base64_string = base64_string.split(",")[1]
+
+    # Decode the base64 string
     image_data = base64.b64decode(base64_string)
+
+    # Convert to a NumPy array and decode to an image
     image_array = np.frombuffer(image_data, dtype=np.uint8)
-    image = (
-        cv2.imdecode(image_array, cv2.IMREAD_COLOR))
+    image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+
     return image
 
 def encode_image_to_base64(image: np.ndarray) -> str:
