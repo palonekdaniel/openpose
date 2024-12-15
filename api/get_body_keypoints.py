@@ -49,11 +49,10 @@ async def process_image_endpoint(request_data: ImageProcessingRequest):
         raise HTTPException(status_code=400, detail=str(e))
 
 def process_body_keypoints(request_data: ImageProcessingRequest):
+    print("Front image: " + request_data.front_img[:100])
+    print("Profile image: " + request_data.profile_img[:100])
     front_image = decode_base64_image(request_data.front_img)
     profile_image = decode_base64_image(request_data.profile_img)
-
-    print("Front image: " + front_image[:100])
-    print("Profile image: " + profile_image[:100])
 
     params = dict()
     params["model_folder"] = "/openpose/models/"
